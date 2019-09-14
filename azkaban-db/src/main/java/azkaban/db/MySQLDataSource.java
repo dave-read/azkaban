@@ -42,10 +42,20 @@ public class MySQLDataSource extends AzkabanDataSource {
     final String user = props.getString("mysql.user");
     final String password = props.getString("mysql.password");
     final int numConnections = props.getInt("mysql.numconnections");
+    final String useSSL= props.getString("mysql.useSSL");
+    final String requireSSL= props.getString("mysql.requireSSL");
 
     final String url = "jdbc:mysql://" + (host + ":" + port + "/" + dbName);
     addConnectionProperty("useUnicode", "yes");
     addConnectionProperty("characterEncoding", "UTF-8");
+    if(useSSL != null) {
+      logger.info("Addding connection property [useSSL:"+useSSL+"]");
+      addConnectionProperty("useSSL", useSSL);
+    }
+    if(requireSSL != null) {
+      logger.info("Addding connection property [requireSSL:"+requireSSL+"]");
+      addConnectionProperty("requireSSL", requireSSL);
+    }
     setDriverClassName("com.mysql.jdbc.Driver");
     setUsername(user);
     setPassword(password);
