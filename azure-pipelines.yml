@@ -14,18 +14,26 @@ pool: dr-azkaban
 steps:
 
 - task: DownloadSecureFile@1
-  name: UpdateConfigFiles
+  name: UsersXml
   displayName: 'Download azkaban-users.xml'
   inputs:
     secureFile: 'azkaban-users-xml'
 
 - script: |
-    echo updating azkaban-users.xml from  $(azkaban-users-xml.secureFilePath) ...
-    cp $(azkaban-users-xml.secureFilePath) azkaban-web-server/src/main/resources/conf/azkaban-users.xml
-    echo updating azkaban.properties from  $(azkaban-properties.secureFilePath) ...
-    cp $(azkaban-properties.secureFilePath) azkaban-web-server/src/main/resources/conf/azkaban.properties
-    cp $(azkaban-properties.secureFilePath) azkaban-exec-server/src/main/resources/conf/azkaban.properties
+    echo updating azkaban-users.xml from  $(UsersXml.secureFilePath) ...
+    cp $(UsersXml.secureFilePath) azkaban-web-server/src/main/resources/conf/azkaban-users.xml
 
+- task: DownloadSecureFile@1
+  name: AzkabanProperties
+  displayName: 'Download azkaban.properties'
+  inputs:
+    secureFile: 'azkaban-properties'
+
+- script: |
+    echo updating azkaban.properties from  $(AzkabanProperties.secureFilePath) ...
+    cp $(AzkabanProperties.secureFilePath) azkaban-web-server/src/main/resources/conf/azkaban.properties
+    cp $(AzkabanProperties.secureFilePath) azkaban-exec-server/src/main/resources/conf/azkaban.properties
+    
 - task: Gradle@2
   inputs:
     workingDirectory: ''
