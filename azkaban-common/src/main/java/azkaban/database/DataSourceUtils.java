@@ -45,10 +45,13 @@ public class DataSourceUtils {
       final String user = props.getString("mysql.user");
       final String password = props.getString("mysql.password");
       final int numConnections = props.getInt("mysql.numconnections");
+      final String useSSL= props.getString("mysql.useSSL");
+      final String requireSSL= props.getString("mysql.requireSSL");
+
 
       dataSource =
           getMySQLDataSource(host, port, database, user, password,
-              numConnections);
+              numConnections, useSSL, requireSSL);
     } else if (databaseType.equals("h2")) {
       final String path = props.getString("h2.path");
       final Path h2DbPath = Paths.get(path).toAbsolutePath();
@@ -63,9 +66,9 @@ public class DataSourceUtils {
    * Create a MySQL DataSource
    */
   public static AzkabanDataSource getMySQLDataSource(final String host, final Integer port,
-      final String dbName, final String user, final String password, final Integer numConnections) {
+      final String dbName, final String user, final String password, final Integer numConnections, final String useSSL, final String requireSSL) {
     return new MySQLBasicDataSource(host, port, dbName, user, password,
-        numConnections);
+        numConnections, useSSL, requireSSL);
   }
 
   /**
@@ -109,12 +112,20 @@ public class DataSourceUtils {
     private final String url;
 
     private MySQLBasicDataSource(final String host, final int port, final String dbName,
-        final String user, final String password, final int numConnections) {
+        final String user, final String password, final int numConnections, final String useSSL, final String requireSSL) {
       super();
 
       this.url = "jdbc:mysql://" + (host + ":" + port + "/" + dbName);
       addConnectionProperty("useUnicode", "yes");
       addConnectionProperty("characterEncoding", "UTF-8");
+      if(useSSL != null) {
+        logger.info("Addding connection property [useSSL:"+useSSL+"]");
+        addConnectionProperty("useSSL", useSSL);
+      }
+      if(requireSSL != null) {
+        logger.info("Addding connection property [requireSSL:"+requireSSL+"]");
+        addConnectionProperty("requireSSL", requireSSL);
+      }
       setDriverClassName("com.mysql.jdbc.Driver");
       setUsername(user);
       setPassword(password);
