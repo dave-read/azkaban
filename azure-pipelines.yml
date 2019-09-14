@@ -28,8 +28,17 @@ steps:
     targetType: 'inline'
     script: mv $DIR/azkaban-web-server-* $DIR/azkaban-web-server.tar.gz
   env:
+    DIR: $(Build.SourcesDirectory)/azkaban-web-server/build/distributions
+
+- publish: $(Build.SourcesDirectory)/azkaban-web-server/build/distributions
+  artifact: azkaban-web-server
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: mv $DIR/azkaban-exec-server-* $DIR/azkaban-exec-server.tar.gz
+  env:
     DIR: $(Build.SourcesDirectory)/azkaban-exec-server/build/distributions
 
 - publish: $(Build.SourcesDirectory)/azkaban-exec-server/build/distributions
-  artifact: azkaban-web-server
+  artifact: azkaban-exec-server
   
