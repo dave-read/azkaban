@@ -23,6 +23,12 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: '--no-parallel --no-daemon clean distTar'
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: mv $DIR/azkaban-web-server-* $DIR/azkaban-web-server.tar.gz
+  env:
+    DIR: $(Build.SourcesDirectory)/azkaban-exec-server/build/distributions
 
 - publish: $(Build.SourcesDirectory)/azkaban-exec-server/build/distributions
   artifact: azkaban-web-server
