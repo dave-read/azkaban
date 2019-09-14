@@ -22,8 +22,8 @@ steps:
     jdkArchitectureOption: 'x64'
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
-    tasks: 'installDist -x test'
+    tasks: 'clean installDist -x test'
 
-- publish: $(System.DefaultWorkingDirectory)/azkaban-web-server/build/distributions
+- publish: $(Build.SourcesDirectory)/azkaban-web-server/build/distributions
   artifact: azkaban-web-server
   
