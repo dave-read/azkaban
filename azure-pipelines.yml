@@ -16,14 +16,14 @@ steps:
   inputs:
     workingDirectory: ''
     gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
+    gradleOptions: '--no-parallel --no-daemon -Xmx3072m'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
-    tasks: 'clean installDist -x test'
+    tasks: 'clean distTar'
 
-- publish: $(Build.SourcesDirectory)/azkaban-web-server/build/distributions
+- publish: $(Build.SourcesDirectory)/azkaban-exec-server/build/distributions
   artifact: azkaban-web-server
   
