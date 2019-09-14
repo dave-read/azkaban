@@ -6,6 +6,9 @@
 trigger:
 - master
 
+variables:
+  skipComponentGovernanceDetection: "true"
+
 pool: dr-azkaban
 
 steps:
@@ -20,3 +23,7 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'installDist -x test'
+
+- publish: $(System.DefaultWorkingDirectory)/azkaban-web-server/build/distributions
+  artifact: azkaban-web-server
+  
