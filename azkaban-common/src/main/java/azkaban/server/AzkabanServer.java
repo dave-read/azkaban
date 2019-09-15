@@ -96,10 +96,13 @@ public abstract class AzkabanServer {
   }
 
   // Simplify containerization by allowing environment variable overrides of config properties
+  // Note: environent var names can't generally include dot (.), so env vars need to use
+  // double_underbar (__) to represent dot.
   private static void overrideConfigsFromEnv(final Props azkabanSettings) {
     System.getenv().forEach((k, v) -> {
-      if(k.startsWith("azkaban.")) {
-        logger.info("Overriing config property from env:"+k);      
+      if(k.startsWith("azkaban__")) {
+        String propKey=k.replaceAll("__", ".");
+        logger.info("Overriing config property from env:"+k+" setting property key to:"+propKey);      
           azkabanSettings.put(k,v);  
       }
     });
