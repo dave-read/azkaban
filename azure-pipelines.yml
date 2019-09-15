@@ -31,7 +31,7 @@ steps:
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
-    tasks: '--no-daemon installDist -x tests'
+    tasks: '--no-daemon installDist -x test'
 
 - task: Docker@2
   displayName: Build azkaban-web-server and push an image to container registry
