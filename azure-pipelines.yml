@@ -9,7 +9,7 @@ trigger:
 variables:
   skipComponentGovernanceDetection: "true"
   imageRepository: "azkaban.azurecr.io"
-  dockerRegistryServiceConnection: "azkaban-devops-mi"
+  dockerRegistryServiceConnection: "azkaban-acr-sp"
 
 
 pool: dr-azkaban
