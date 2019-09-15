@@ -17,6 +17,7 @@ package azkaban.server;
 
 import static azkaban.Constants.DEFAULT_PORT_NUMBER;
 import static azkaban.Constants.DEFAULT_SSL_PORT_NUMBER;
+import static org.junit.Assert.assertArrayEquals;
 
 import azkaban.Constants;
 import azkaban.server.session.SessionCache;
@@ -77,6 +78,7 @@ public abstract class AzkabanServer {
 
     if (azkabanSettings != null) {
       updateDerivedConfigs(azkabanSettings);
+      overrideConfigsFromEnv(azkabanSettings);
     }
     return azkabanSettings;
   }
@@ -92,6 +94,16 @@ public abstract class AzkabanServer {
     azkabanSettings.put("server.hostname", hostname);
     azkabanSettings.put("server.port", port);
     azkabanSettings.put("server.useSSL", String.valueOf(isSslEnabled));
+  }
+
+  // Simplify containerization by allowing environment variable overrides of config properties
+  private static void overrideConfigsFromEnv(final Props azkabanSettings) {
+    System.getenv().forEach((k, v) -> {
+      if(k.startsWith("azkaban.")) {
+        logger.info("Overriing config property from env:"+k);      
+          azkabanSettings.put(k,v);  
+      }
+    });
   }
 
   public static Props loadAzkabanConfigurationFromDirectory(final File dir) {
