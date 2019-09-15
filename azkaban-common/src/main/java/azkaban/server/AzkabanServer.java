@@ -17,7 +17,6 @@ package azkaban.server;
 
 import static azkaban.Constants.DEFAULT_PORT_NUMBER;
 import static azkaban.Constants.DEFAULT_SSL_PORT_NUMBER;
-import static org.junit.Assert.assertArrayEquals;
 
 import azkaban.Constants;
 import azkaban.server.session.SessionCache;
