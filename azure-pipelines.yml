@@ -42,6 +42,7 @@ steps:
     containerRegistry: $(dockerRegistryServiceConnection)
     tags: |
       $(BUILD_DATE)
+      latest
 
 - task: Docker@2
   displayName: Build azkaban-exec-server and push an image to container registry
@@ -53,3 +54,4 @@ steps:
     containerRegistry: $(dockerRegistryServiceConnection)
     tags: |
       $(BUILD_DATE)
+      latest
