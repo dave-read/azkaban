@@ -8,32 +8,14 @@ trigger:
 
 variables:
   skipComponentGovernanceDetection: "true"
+  imageRepository: "azkaban.azurecr.io"
+  dockerRegistryServiceConnection: "azkaban-devops-mi"
+
 
 pool: dr-azkaban
 
 steps:
 
-- task: DownloadSecureFile@1
-  name: UsersXml
-  displayName: 'Download azkaban-users.xml'
-  inputs:
-    secureFile: 'azkaban-users-xml'
-
-- script: |
-    echo updating azkaban-users.xml from  $(UsersXml.secureFilePath) ...
-    cp $(UsersXml.secureFilePath) azkaban-web-server/src/main/resources/conf/azkaban-users.xml
-
-- task: DownloadSecureFile@1
-  name: AzkabanProperties
-  displayName: 'Download azkaban.properties'
-  inputs:
-    secureFile: 'azkaban-properties'
-
-- script: |
-    echo updating azkaban.properties from  $(AzkabanProperties.secureFilePath) ...
-    cp $(AzkabanProperties.secureFilePath) azkaban-web-server/src/main/resources/conf/azkaban.properties
-    cp $(AzkabanProperties.secureFilePath) azkaban-exec-server/src/main/resources/conf/azkaban.properties
-    
 - task: Gradle@2
   inputs:
     workingDirectory: ''
@@ -45,3 +27,21 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: '--no-daemon clean installDist'
+
+- task: Docker@2
+  displayName: Build azkaban-web-server and push an image to container registry
+  inputs:
+    command: buildAndPush
+    repository: $(imageRepository)
+    dockerfile: ./azkaban-web-server/Dockerfile
+    buildContext: ./azkaban-web-server/build/install/azkaban-web-server
+    containerRegistry: $(dockerRegistryServiceConnection)
+
+- task: Docker@2
+  displayName: Build azkaban-exec-server and push an image to container registry
+  inputs:
+    command: buildAndPush
+    repository: $(imageRepository)
+    dockerfile: ./azkaban-exec-server/Dockerfile
+    buildContext: ./azkaban-exec-server/build/install/azkaban-exec-server
+    containerRegistry: $(dockerRegistryServiceConnection)    
