@@ -9,7 +9,6 @@ trigger:
 variables:
   skipComponentGovernanceDetection: "true"
   dockerRegistryServiceConnection: "azkaban-acr-sp"
-  buildDateTime: $(Date:yyyyMMdd-HHmmss)
 
 
 pool: dr-azkaban
@@ -36,8 +35,6 @@ steps:
     dockerfile: ./azkaban-web-server/Dockerfile
     buildContext: ./azkaban-web-server/build/install/azkaban-web-server
     containerRegistry: $(dockerRegistryServiceConnection)
-    tags: |
-      $(buildDateTime)
 
 - task: Docker@2
   displayName: Build azkaban-exec-server and push an image to container registry
@@ -47,5 +44,3 @@ steps:
     dockerfile: ./azkaban-exec-server/Dockerfile
     buildContext: ./azkaban-exec-server/build/install/azkaban-exec-server
     containerRegistry: $(dockerRegistryServiceConnection)
-    tags: |
-      $(buildDateTime)
