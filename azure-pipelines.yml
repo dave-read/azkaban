@@ -8,8 +8,8 @@ trigger:
 
 variables:
   skipComponentGovernanceDetection: "true"
-  imageRepository: "azkaban.azurecr.io"
   dockerRegistryServiceConnection: "azkaban-acr-sp"
+  buildDateTime: $(Date:yyyyMMdd-HHmmss)
 
 
 pool: dr-azkaban
@@ -32,16 +32,20 @@ steps:
   displayName: Build azkaban-web-server and push an image to container registry
   inputs:
     command: buildAndPush
-    repository: $(imageRepository)
+    repository: azkaban-web-server
     dockerfile: ./azkaban-web-server/Dockerfile
     buildContext: ./azkaban-web-server/build/install/azkaban-web-server
     containerRegistry: $(dockerRegistryServiceConnection)
+    tags: |
+      $(buildDateTime)
 
 - task: Docker@2
   displayName: Build azkaban-exec-server and push an image to container registry
   inputs:
     command: buildAndPush
-    repository: $(imageRepository)
+    repository: azkaban-exec-server
     dockerfile: ./azkaban-exec-server/Dockerfile
     buildContext: ./azkaban-exec-server/build/install/azkaban-exec-server
-    containerRegistry: $(dockerRegistryServiceConnection)    
+    containerRegistry: $(dockerRegistryServiceConnection)
+    tags: |
+      $(buildDateTime)
