@@ -1,0 +1,4 @@
+
+curl http://exec-server-0.exec-service.azkaban.svc.cluster.local:12321/executor?action=activate
+curl http://exec-server-1.exec-service.azkaban.svc.cluster.local:12321/executor?action=activate
+curl http://exec-server-2.exec-service.azkaban.svc.cluster.local:12321/executor?action=activate

@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: exec-service
+  namespace: azkaban
+  labels:
+    app: exec-service
+spec:
+  ports:
+  - port: 8081
+    name: exec-service
+  clusterIP: None
+  selector:
+    app: exec-service
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: exec-server
+  namespace: azkaban
+spec:
+  selector:
+    matchLabels:
+      app: exec-service # has to match .spec.template.metadata.labels
+  serviceName: "exec-service"
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: exec-service # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: exec-server
+        image: azkaban.azurecr.io/azkaban-exec-server:latest
+        #image: ubuntu:16.04
+        command: [ "/bin/bash" ]
+        # Invoke internal script to avoid redirect of stdout/stderr to local file
+        args: ["-c", "/azkaban/bin/internal/internal-start-executor.sh; sleep infinity & wait" ] 
+        ports:
+        - containerPort: 8081
+          name: exec-service
+        volumeMounts:
+        # From Secrets
+        - name: azkaban-private-properties
+          mountPath: "/azkaban/conf/azkaban.private.properties"
+          subPath: azkaban.private.properties
+          readOnly: true
+        # From ConfigMaps          
+        - name: global-properties
+          mountPath: "/azkaban/conf/global.properties"
+          subPath: global.properties
+          readOnly: true
+        - name: azkaban-properties
+          mountPath: "/azkaban/conf/azkaban.properties"
+          subPath: azkaban.properties
+          readOnly: true
+        - name: log4j-properties
+          mountPath: "/azkaban/conf/log4j.properties"
+          subPath: log4j.properties
+          readOnly: true
+      volumes:
+      # Secrets
+      - name: azkaban-private-properties
+        secret:
+          secretName: azkaban-private-properties
+      # ConfigMaps
+      - name: global-properties
+        configMap:
+          name: global-properties
+      - name: azkaban-properties
+        configMap:
+          name: azkaban-properties                  
+      - name: log4j-properties
+        configMap:
+          name: log4j-properties                                      
