@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: azkaban
+  labels:
+    app: web-service
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"    
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8081
+    name: web
+  selector:
+    app: web-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+  namespace: azkaban
+spec:
+  replicas: 1 # by default is 1
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      labels:
+        app: web-server # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: web-server
+        image: azkaban.azurecr.io/azkaban-web-server:latest
+        #image: ubuntu:16.04
+        command: [ "/bin/bash" ]
+        args: ["-c", "/azkaban/bin/internal/internal-start-web.sh; sleep infinity & wait" ]        
+        ports:
+        - containerPort: 8081
+          name: web
+        volumeMounts:
+        # From Secrets
+        - name: azkaban-private-properties
+          mountPath: "/azkaban/conf/azkaban.private.properties"
+          subPath: azkaban.private.properties
+          readOnly: true
+        - name: azkaban-users-xml
+          mountPath: "/azkaban/conf/azkaban-users.xml"
+          subPath: azkaban-users.xml
+          readOnly: true
+        # From ConfigMaps          
+        - name: global-properties
+          mountPath: "/azkaban/conf/global.properties"
+          subPath: global.properties
+          readOnly: true
+        - name: azkaban-properties
+          mountPath: "/azkaban/conf/azkaban.properties"
+          subPath: azkaban.properties
+          readOnly: true
+        - name: log4j-properties
+          mountPath: "/azkaban/conf/log4j.properties"
+          subPath: log4j.properties
+          readOnly: true
+      volumes:
+      # Secrets
+      - name: azkaban-private-properties
+        secret:
+          secretName: azkaban-private-properties
+      - name: azkaban-users-xml
+        secret:
+          secretName: azkaban-users-xml
+      # ConfigMaps
+      - name: global-properties
+        configMap:
+          name: global-properties
+      - name: azkaban-properties
+        configMap:
+          name: azkaban-properties                  
+      - name: log4j-properties
+        configMap:
+          name: log4j-properties                                
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: www
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     storageClassName: "my-storage-class"
+  #     resources:
+  #       requests:
+  #         storage: 1Gi
